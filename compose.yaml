@@ -1,0 +1,35 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: unicomms
+      MYSQL_USER: unicomms
+      MYSQL_PASSWORD: unicomms-local-only
+      MYSQL_ROOT_PASSWORD: local-root-only
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - unicomms-mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uunicomms -punicomms-local-only --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+  server:
+    build: .
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      BIND_ADDRESS: 0.0.0.0
+      DB_URL: jdbc:mysql://mysql:3306/unicomms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+      DB_USER: unicomms
+      DB_PASSWORD: unicomms-local-only
+      REGISTRATION_ENABLED: "true"
+      ALLOWED_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+    ports:
+      - "127.0.0.1:8080:8080"
+    restart: "no"
+volumes:
+  unicomms-mysql:

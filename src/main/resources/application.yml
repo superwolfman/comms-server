@@ -1,0 +1,31 @@
+server:
+  port: ${PORT:8080}
+  address: ${BIND_ADDRESS:127.0.0.1}
+  error:
+    include-message: never
+spring:
+  application:
+    name: comms-server
+  datasource:
+    url: ${DB_URL:jdbc:mysql://127.0.0.1:3307/unicomms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC}
+    username: ${DB_USER:unicomms}
+    password: ${DB_PASSWORD:unicomms-local-only}
+    hikari:
+      maximum-pool-size: 12
+  flyway:
+    enabled: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+comms:
+  allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
+  registration-enabled: ${REGISTRATION_ENABLED:false}
+  token-hours: ${TOKEN_HOURS:24}
